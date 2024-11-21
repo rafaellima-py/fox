@@ -1,0 +1,65 @@
+    
+    while True:
+        
+        await sleep(10)
+        
+        # Itera sobre uma cópia para evitar o erro de modificação do dicionário
+        for user, dados in list(temporizador_user.items()):
+           temporizador_user[user]['tempo'] -= 10
+           print(user)
+           existe_usuario = Usuario().usuario_existe(str(user))
+           if existe_usuario:
+                idioma = Usuario().ver_idioma(str(user))
+              
+               
+           print(temporizador_user)
+           if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg1'] == False and temporizador_user[user]['tempo'] == 0:
+               await bot.send_message(user, mensagens[idioma]['msg1'])
+               temporizador_user[user]['msg1'] = True
+               temporizador_user[user]['chamada'] -= 1
+               print(f"Enviando mensagem para {user}")
+               await sleep(20)
+        
+            
+           if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg2'] == False and temporizador_user[user]['tempo'] < 0:
+                await bot.send_message(user, mensagens[idioma]['msg2'])
+                temporizador_user[user]['msg2'] = True
+                temporizador_user[user]['chamada'] -= 1
+                print(f"Enviando mensagem para {user}")
+                await sleep(20)
+           
+           if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg3'] == False and temporizador_user[user]['tempo'] < 0:
+                await bot.send_message(user, mensagens[idioma]['msg3'])
+                temporizador_user[user]['msg3'] = True
+                temporizador_user[user]['chamada'] -= 1
+                print(f"Enviando mensagem para {user}")
+                await sleep(20)
+
+           if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg4'] == False and temporizador_user[user]['tempo'] < 0:
+                await bot.send_message(user, mensagens[idioma]['msg3'])
+                temporizador_user[user]['msg4'] = True
+                temporizador_user[user]['chamada'] -= 1
+                print(f"Enviando mensagem para {user}")
+                await sleep(20)
+           
+           if temporizador_user[user]['chamada'] == 0:
+               temporizador_user.pop(user, None)
+
+
+
+
+
+
+
+        case 'aceitar' | 'cancelar':
+                # Verifique se a callback data segue o formato esperado 'aceitar_123' ou 'cancelar_123'
+                if '_' in call.data:
+                    # Tente extrair o message_id da callback data
+                    try:
+                        message_id = int(call.data.split('_')[1])
+                    except ValueError:
+                        await bot.send_message(call.message.chat.id, 'Erro: formato inválido de callback data.')
+                        return
+                
+                # Buscar o ID do usuário que enviou a imagem
+                    user_id = user_images.get
