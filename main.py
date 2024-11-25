@@ -9,13 +9,14 @@ from asyncio import sleep
 import datetime
 from datetime import timedelta
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatInviteLink
+from random import randint
 mensagens = {}
 temporizador_user = {}
 user_plano = {}
 admin = '6721447659'
 user_images = {}
 canal =  '-1002411773802'#'@SecretinhoOficial'
-
+historico_previas = {}
 async def set_tempo(id):
     
     tempo = 100
@@ -193,6 +194,7 @@ bot = AsyncTeleBot(config('TELEGRAM_KEY_TEST'))
 @bot.message_handler(commands=['start'])
 async def start(message):
     id_user = message.from_user.id
+    historico_previas[id_user] = False
     await set_tempo(message.from_user.id)
     if not bot_in_private(message):
         return
@@ -283,10 +285,15 @@ async def list_products(message,idioma):
 async def show_plan(message, plan):
     user_id = message.from_user.id
     idioma = Usuario().ver_idioma(str(user_id))
+    
+    
     print(idioma, user_id)
     InlineKeyboardMarkup(row_width=2)
-    with open(f'sources/{plan}.jpeg', 'rb') as f:
-        await bot.send_photo(user_id, f, caption=language[idioma][plan])
+   
+    if not historico_previas[user_id]:
+        await show_previas(message)
+        historico_previas[user_id] = True
+    await bot.send_message(chat_id=user_id, text=language[idioma][plan])
         
     markup = InlineKeyboardMarkup(row_width=2)
     bizum_bt = InlineKeyboardButton(language[idioma]['bizum'], callback_data='cb_bisum')
@@ -301,6 +308,14 @@ async def show_plan(message, plan):
         await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
 
 
+async def show_previas(message):
+    user_id = message.from_user.id
+    idioma = Usuario().ver_idioma(str(user_id))
+    
+    
+    with open(f'sources/previa{randint(1, 2)}.mp4', 'rb') as f:
+        await bot.send_video(user_id, f, caption=language[idioma]['previa'])
+        
 
 @bot.callback_query_handler(func=lambda call: True)
 async def callback(call):
@@ -339,7 +354,7 @@ async def callback(call):
             'username': call.from_user.username,
             'idioma': idioma,
             'plano': 'semanal',
-            'preco': 25.99
+            'preco': 'None'
         
     }
             print(user_plano)
@@ -355,7 +370,7 @@ async def callback(call):
             'username': call.from_user.username,
             'idioma': idioma,
             'plano': 'mensal',
-            'preco': 25.99
+            'preco': None
         
     }        
             print(user_plano)
@@ -370,7 +385,7 @@ async def callback(call):
             'username': call.from_user.username,
             'idioma': idioma,
             'plano': 'trimestral',
-            'preco': 38.99,
+            'preco': None
         
     }      
             print(user_plano)

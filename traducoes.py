@@ -64,7 +64,8 @@ language = {
         'trimestral': '😈 Trimestral € 38.99',
         'mbway': 'Pagar con Mbway',
         'bizum': 'Pagar con Bizum',
-        'esperando_pg': 'Esperando pago...'
+        'esperando_pg': 'Esperando pago...',
+        'previa': '🚧 Confira una previa del nuestro contenido exclusivo 🚧'
     },
     
     "portugues": {
@@ -105,7 +106,8 @@ language = {
         'trimestral': f'😈 Trimestral € {str(preco_pt["trimestral"])}',
         'mbway': 'Pagar com Mbway',
         'bizum': 'Pagar com Bizum',
-        'esperando_pg': 'A aguardar pagamento...'
+        'esperando_pg': 'A aguardar pagamento...',
+        'previa': '🚧 Confira uma prévia do nosso conteúdo exclusivo 🚧',
     },
     
     "portugues_br": {
@@ -146,7 +148,8 @@ language = {
         'trimestral': f'😈 Trimestral R$ {str(preco_br["trimestral"])}',
         'mbway': 'Pagar com Mbway',
         'bizum': 'Pagar com Bizum',
-        'esperando_pg': 'Esperando pagamento...'
+        'esperando_pg': 'Esperando pagamento...',
+        'previa': '🚧 Confira uma prévia do nosso conteúdo exclusivo 🚧'
     }
 }
 
