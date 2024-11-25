@@ -9,6 +9,7 @@ from asyncio import sleep
 import datetime
 from datetime import timedelta
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatInviteLink
+mensagens = {}
 temporizador_user = {}
 user_plano = {}
 admin = '6721447659'
@@ -131,12 +132,14 @@ async def temporizador():
         'msg3': 'Has estado ausente por un tiempo, pero el contenido exclusivo sigue llegando. 🎁 ¡Disfruta ahora y sumérgete en la experiencia VIP que solo nuestro canal te ofrece! 🔥',
         'msg4': '¡Hey! ¿Todo bien por ahí? 🧐 El VIP está más caliente que nunca y todavía puedes regresar cuando quieras. ¡Entra ahora y mira lo que te has perdido! 🚀😏',
     },
-    'ingles': {
-        'msg1': 'Hello! 🎯 Are you there? We have a lot of exclusive content waiting for you in VIP! Don’t miss the chance to come back and enjoy it all first-hand. 😏🔥 🇺🇸',
-        'msg2': '👀 We missed you! It’s time to regain access to exclusive content. Come enjoy it now, we’re waiting for you in VIP. 😈✨ 🇺🇸',
-        'msg3': 'You’ve been away for a while, but the exclusive content keeps coming! 🎁 Enjoy it now and dive into the VIP experience that only our channel offers! 🔥 🇺🇸',
-        'msg4': 'Hey! How’s it going? 🧐 VIP is hotter than ever, and you can still come back anytime! Access it now and see what you’ve missed. 🚀😏 🇺🇸',
-    }
+    
+    'portugues_br': {
+        'msg1': 'Olá! 🎯 Está por aí? Temos muito conteúdo quente esperando por você no VIP! Não perca a chance de voltar e curtir tudo em primeira mão. 😏🔥',
+        'msg2': '👀 Sentimos sua falta! Está na hora de retomar o acesso ao conteúdo exclusivo. Venha aproveitar agora, estamos esperando por você no VIP. 😈✨',
+        'msg3': 'Você ficou ausente por um tempo, mas o conteúdo exclusivo não para de chegar! 🎁 Aproveite agora e se entregue à experiência VIP que só o nosso canal oferece! 🔥',
+        'msg4': 'Hey! Tudo bem por aí? 🧐 O VIP está mais quente do que nunca e você ainda pode voltar quando quiser! Acesse agora e veja o que perdeu. 🚀😏',
+    
+        }
 }
 
     while True:
@@ -185,7 +188,7 @@ async def temporizador():
 
 
 
-bot = AsyncTeleBot(config('TELEGRAM_KEY'))
+bot = AsyncTeleBot(config('TELEGRAM_KEY_TEST'))
 
 @bot.message_handler(commands=['start'])
 async def start(message):
@@ -214,7 +217,7 @@ async def start(message):
         language_markup = InlineKeyboardMarkup(row_width=2)
         language_markup.add(InlineKeyboardButton(f'🇵🇹 Português', callback_data='set_language_portugues'))
         language_markup.add(InlineKeyboardButton(f'🇪🇸 Espanhol', callback_data='set_language_espanhol'))
-
+        language_markup.add(InlineKeyboardButton(f'🇧🇷 Português do Brasil', callback_data='set_language_portugues_br'))
         await bot.send_message(message.chat.id, 'Choose your language', reply_markup=language_markup)
    
     if usuario_existe:
@@ -224,6 +227,7 @@ async def start(message):
             language_markup = InlineKeyboardMarkup(row_width=2)
             language_markup.add(InlineKeyboardButton(f'🇵🇹 Português', callback_data='set_language_portugues'))
             language_markup.add(InlineKeyboardButton(f'🇪🇸 Espanhol', callback_data='set_language_espanhol'))
+            language_markup.add(InlineKeyboardButton(f'🇧🇷 Português do Brasil', callback_data='set_language_portugues_br'))
             await bot.send_message(message.chat.id, 'Choose your language', reply_markup=language_markup)
 
         if qtd_assinatura == 0:
@@ -259,7 +263,11 @@ async def wellcome_new_user(message, id_user):
             await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(message, idioma)
 
-
+    if idioma == 'portugues_br':
+        with open('sources/portugues.jpeg', 'rb') as f:
+            await bot.send_photo(message.chat.id, f)
+            await bot.send_message(message.chat.id, language[idioma]['inicio'])
+            await list_products(message, idioma)
 
 async def list_products(message,idioma):
     
@@ -279,14 +287,18 @@ async def show_plan(message, plan):
     InlineKeyboardMarkup(row_width=2)
     with open(f'sources/{plan}.jpeg', 'rb') as f:
         await bot.send_photo(user_id, f, caption=language[idioma][plan])
+        
     markup = InlineKeyboardMarkup(row_width=2)
     bizum_bt = InlineKeyboardButton(language[idioma]['bizum'], callback_data='cb_bisum')
     mbway_bt = InlineKeyboardButton(language[idioma]['mbway'], callback_data='cb_mbway')
     voltar_bt = InlineKeyboardButton('Back', callback_data='voltar')
-
-    markup.add(bizum_bt, mbway_bt, voltar_bt)
-    await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
-
+    pix_bt = InlineKeyboardButton('Pague via Pix', callback_data='cb_pix')
+    if idioma != 'portugues_br':
+        markup.add(bizum_bt, mbway_bt, voltar_bt)
+        await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
+    else:
+        markup.add(pix_bt, voltar_bt)
+        await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
 
 
 
@@ -312,7 +324,14 @@ async def callback(call):
             Usuario().inserir_idioma(str(call.from_user.id), 'espanhol')
             await wellcome_new_user(call.message, str(call.from_user.id))
 
+        case 'set_language_portugues_br':
+            await bot.delete_message(call.message.chat.id, call.message.id)
+            Usuario().inserir_idioma(str(call.from_user.id), 'portugues_br')
+            await wellcome_new_user(call.message, str(call.from_user.id))
+        
         case 'pl_semanal':
+            #await bot.delete_message(call.message.chat.id, call.message.id)
+            await bot.delete_message(call.message.chat.id, call.message.id)
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await show_plan(call, 'semanal')
             user_plano[call.from_user.id] = {
@@ -326,24 +345,26 @@ async def callback(call):
             print(user_plano)
 
         case 'pl_mensal':
+            await bot.delete_message(call.message.chat.id, call.message.id)
             await show_plan(call, 'mensal')
             await reset_tempo(call.from_user.id)
             idioma = Usuario().ver_idioma(str(call.from_user.id))
-            await show_plan(call, 'semanal')
+           
             user_plano[call.from_user.id] = {
             'nome': call.from_user.first_name,
             'username': call.from_user.username,
             'idioma': idioma,
             'plano': 'mensal',
-            'preco': 15.99
+            'preco': 25.99
         
     }        
             print(user_plano)
         case 'pl_trimestral':
+            await bot.delete_message(call.message.chat.id, call.message.id)
             await reset_tempo(call.from_user.id)
             await show_plan(call, 'trimestral')
             idioma = Usuario().ver_idioma(str(call.from_user.id))
-            await show_plan(call, 'semanal')
+        
             user_plano[call.from_user.id] = {
             'nome': call.from_user.first_name,
             'username': call.from_user.username,
@@ -369,6 +390,17 @@ async def callback(call):
             chave_pg = "Chave: 933466639"
             await bot.send_message(call.from_user.id, text=f"```{chave_pg}```", parse_mode="MarkdownV2")
             await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])
+        
+
+        case 'cb_pix':
+            idioma = Usuario().ver_idioma(str(call.from_user.id))
+            await reset_tempo(call.from_user.id)
+            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'])
+            chave_pg = "Chave: c2e51e73-813e-45f6-87dd-e7b70f859870"
+            await bot.send_message(call.from_user.id, text=f"```{chave_pg}```", parse_mode="MarkdownV2")
+            await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])
+           
+        
         case 'voltar':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             
@@ -485,7 +517,7 @@ async def handle_photo(message):
 
 async def main():
     print('Iniciando verificação de assinaturas')
-    asyncio.create_task(verificar_assinaturas())
+    #asyncio.create_task(verificar_assinaturas())
         
         
     print('Iniciando temporizador')
