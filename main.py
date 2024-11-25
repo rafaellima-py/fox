@@ -211,7 +211,8 @@ async def start(message):
     'username': message.from_user.username,
     'idioma': None,  # Se você quiser manter idioma como opcional
     'qt_assinatura': 0,
-    'qtd_start': 1
+    'qtd_start': 1,
+    'data_cadastro': datetime.now()
 }
        
 

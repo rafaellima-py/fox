@@ -1,3 +1,5 @@
-from random import randint
+from datetime import datetime
 
-print(randint(1, 2))
+data = datetime.now()
+
+print(data)
