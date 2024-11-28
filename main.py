@@ -212,7 +212,7 @@ async def start(message):
     'idioma': None,  # Se você quiser manter idioma como opcional
     'qt_assinatura': 0,
     'qtd_start': 1,
-    'data_cadastro': datetime.now()
+    'data_cadastro': datetime.datetime.now()
 }
        
 
@@ -301,11 +301,12 @@ async def show_plan(message, plan):
     mbway_bt = InlineKeyboardButton(language[idioma]['mbway'], callback_data='cb_mbway')
     voltar_bt = InlineKeyboardButton('Back', callback_data='voltar')
     pix_bt = InlineKeyboardButton('Pague via Pix', callback_data='cb_pix')
+    bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
     if idioma != 'portugues_br':
-        markup.add(bizum_bt, mbway_bt, voltar_bt)
+        markup.add(bizum_bt, mbway_bt, bt_suporte, voltar_bt)
         await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
     else:
-        markup.add(pix_bt, voltar_bt)
+        markup.add(pix_bt, bt_suporte, voltar_bt)
         await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
 
 
@@ -394,7 +395,10 @@ async def callback(call):
         case 'cb_bisum':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
-            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'])
+            markup = InlineKeyboardMarkup(row_width=2)
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            markup.add(bt_suporte)
+            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
             chave_pg = "Chave: 604338509"
             await bot.send_message(call.from_user.id, text=f"```{chave_pg}```", parse_mode="MarkdownV2")
             await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])
@@ -402,7 +406,10 @@ async def callback(call):
         case 'cb_mbway':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
-            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'])
+            markup = InlineKeyboardMarkup(row_width=2)
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            markup.add(bt_suporte)
+            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
             chave_pg = "Chave: 933466639"
             await bot.send_message(call.from_user.id, text=f"```{chave_pg}```", parse_mode="MarkdownV2")
             await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])
@@ -411,7 +418,10 @@ async def callback(call):
         case 'cb_pix':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
-            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'])
+            markup = InlineKeyboardMarkup(row_width=2)
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            markup.add(bt_suporte)
+            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
             chave_pg = "Chave: c2e51e73-813e-45f6-87dd-e7b70f859870"
             await bot.send_message(call.from_user.id, text=f"```{chave_pg}```", parse_mode="MarkdownV2")
             await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])

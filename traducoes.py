@@ -65,7 +65,9 @@ language = {
         'mbway': 'Pagar con Mbway',
         'bizum': 'Pagar con Bizum',
         'esperando_pg': 'Esperando pago...',
-        'previa': '🚧 Confira una previa del nuestro contenido exclusivo 🚧'
+        'previa': '🚧 Confira una previa del nuestro contenido exclusivo 🚧',
+        'suporte': '💬 Si tienes alguna duda, pregunta o sugerencia, contáctanos en nuestro canal de suporte.',
+        'bt_suporte': '💬 Suporte',
     },
     
     "portugues": {
@@ -108,6 +110,8 @@ language = {
         'bizum': 'Pagar com Bizum',
         'esperando_pg': 'A aguardar pagamento...',
         'previa': '🚧 Confira uma prévia do nosso conteúdo exclusivo 🚧',
+        'suporte': '💬 Se você tiver alguma dúvida, pergunte ou sugira algo, entre em contato no nosso canal de suporte.',
+        'bt_suporte': '💬 Suporte',
     },
     
     "portugues_br": {
@@ -149,7 +153,10 @@ language = {
         'mbway': 'Pagar com Mbway',
         'bizum': 'Pagar com Bizum',
         'esperando_pg': 'Esperando pagamento...',
-        'previa': '🚧 Confira uma prévia do nosso conteúdo exclusivo 🚧'
+        'previa': '🚧 Confira uma prévia do nosso conteúdo exclusivo 🚧',
+        'suporte': '💬 Se você tiver alguma dúvida, pergunte ou sugira algo, entre em contato no nosso canal de suporte.',
+        'bt_suporte': '💬 Suporte',
+        
     }
 }
 
