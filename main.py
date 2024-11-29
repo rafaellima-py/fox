@@ -289,7 +289,7 @@ async def show_plan(message, plan):
     
     
     print(idioma, user_id)
-    InlineKeyboardMarkup(row_width=2)
+    
    
     if not historico_previas[user_id]:
         await show_previas(message)
@@ -301,12 +301,14 @@ async def show_plan(message, plan):
     mbway_bt = InlineKeyboardButton(language[idioma]['mbway'], callback_data='cb_mbway')
     voltar_bt = InlineKeyboardButton('Back', callback_data='voltar')
     pix_bt = InlineKeyboardButton('Pague via Pix', callback_data='cb_pix')
+    paypal_bt = InlineKeyboardButton('Pague via Paypal', callback_data='cb_paypal')
+    revolut_bt = InlineKeyboardButton(language[idioma]['bt_revolut'], callback_data='cb_revolut' )
     bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
     if idioma != 'portugues_br':
-        markup.add(bizum_bt, mbway_bt, bt_suporte, voltar_bt)
+        markup.add(bizum_bt, mbway_bt, paypal_bt, revolut_bt, bt_suporte, voltar_bt)
         await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
     else:
-        markup.add(pix_bt, bt_suporte, voltar_bt)
+        markup.add(pix_bt,revolut_bt, paypal_bt, bt_suporte, voltar_bt)
         await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
 
 
@@ -426,7 +428,28 @@ async def callback(call):
             await bot.send_message(call.from_user.id, text=f"```{chave_pg}```", parse_mode="MarkdownV2")
             await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])
            
+        case 'cb_revolut':
+            
+            idioma = Usuario().ver_idioma(str(call.from_user.id))
+            await reset_tempo(call.from_user.id)
+            markup = InlineKeyboardMarkup(row_width=2)
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            pagar_revolut = InlineKeyboardButton(language[idioma]['bt_revolut'], url='https://revolut.me/cauad')
+            markup.add(pagar_revolut, bt_suporte )
+            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
+            await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])
         
+        case 'cb_paypal':
+            idioma = Usuario().ver_idioma(str(call.from_user.id))
+            await reset_tempo(call.from_user.id)
+            markup = InlineKeyboardMarkup(row_width=2)
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            markup.add(bt_suporte)
+            await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
+            chave_pg = "Chave: foxltda00@gmail.com"
+            await bot.send_message(call.from_user.id, text=f"```{chave_pg}```", parse_mode="MarkdownV2")
+            await bot.send_message(call.from_user.id, language[idioma]['esperando_pg'])
+           
         case 'voltar':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             

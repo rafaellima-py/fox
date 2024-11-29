@@ -68,6 +68,7 @@ language = {
         'previa': '🚧 Confira una previa del nuestro contenido exclusivo 🚧',
         'suporte': '💬 Si tienes alguna duda, pregunta o sugerencia, contáctanos en nuestro canal de suporte.',
         'bt_suporte': '💬 Suporte',
+        'bt_revolut': '💰 Pagar con Revolut',
     },
     
     "portugues": {
@@ -112,6 +113,7 @@ language = {
         'previa': '🚧 Confira uma prévia do nosso conteúdo exclusivo 🚧',
         'suporte': '💬 Se você tiver alguma dúvida, pergunte ou sugira algo, entre em contato no nosso canal de suporte.',
         'bt_suporte': '💬 Suporte',
+        'bt_revolut': '💰 Pagar com Revolut',
     },
     
     "portugues_br": {
@@ -156,6 +158,7 @@ language = {
         'previa': '🚧 Confira uma prévia do nosso conteúdo exclusivo 🚧',
         'suporte': '💬 Se você tiver alguma dúvida, pergunte ou sugira algo, entre em contato no nosso canal de suporte.',
         'bt_suporte': '💬 Suporte',
+        'bt_revolut': '💰 Pagar com Revolut',
         
     }
 }
