@@ -119,6 +119,8 @@ async def verificar_assinaturas():
                 print(f'{id}: aviso de expiração em 1 dia enviado')
                 
                 
+
+
 async def temporizador():
     mensagens = {
     'portugues': {
@@ -144,50 +146,48 @@ async def temporizador():
 }
 
     while True:
-        await sleep(10)
-        
-        # Itera sobre uma cópia para evitar o erro de modificação do dicionário
         for user, dados in list(temporizador_user.items()):
+            # Atualiza o tempo restante
             temporizador_user[user]['tempo'] -= 10
+            print(temporizador_user)
+            # Verifica se o usuário ainda existe
             existe = Usuario().usuario_existe(str(user))
-            if existe:
-                idioma = Usuario().ver_idioma(str(user))
-                #if idioma == None:
-                #    Usuario.inserir_idioma(str(user), 'portugues')
-                
-                
-                print(temporizador_user)
-                if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg1'] == False and temporizador_user[user]['tempo'] == 0:
-                    await bot.send_message(user, mensagens[idioma]['msg1'])
-                    temporizador_user[user]['msg1'] = True
-                    temporizador_user[user]['chamada'] -= 1
-                    print(f"Enviando mensagem para {user}")
-                    await sleep(3600)
+            if not existe:
+                temporizador_user.pop(user, None)
+                continue
 
-                if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg2'] == False and temporizador_user[user]['tempo'] < 0:
-                    await bot.send_message(user, mensagens[idioma]['msg2'])
-                    temporizador_user[user]['msg2'] = True
-                    temporizador_user[user]['chamada'] -= 1
-                    print(f"Enviando mensagem para {user}")
-                    await sleep(3600*2)
+            # Obtém o idioma do usuário
+            idioma = Usuario().ver_idioma(str(user))
+            if idioma is None:
+                continue
 
-                if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg3'] == False and temporizador_user[user]['tempo'] < 0:
-                    await bot.send_message(user, mensagens[idioma]['msg3'])
-                    temporizador_user[user]['msg3'] = True
-                    temporizador_user[user]['chamada'] -= 1
-                    print(f"Enviando mensagem para {user}")
-                    await sleep(3600*3)
+            # Envio das mensagens baseado no tempo e status
+            if not dados['msg1'] and dados['tempo'] <= 0:
+                await bot.send_message(user, mensagens[idioma]['msg1'])
+                temporizador_user[user]['msg1'] = True
+                temporizador_user[user]['tempo'] += 3600  # Aguarda 1 hora para a próxima mensagem
 
-                if temporizador_user[user]['chamada'] > 0 and temporizador_user[user]['msg4'] == False and temporizador_user[user]['tempo'] < 0:
-                    await bot.send_message(user, mensagens[idioma]['msg3'])
-                    temporizador_user[user]['msg4'] = True
-                    temporizador_user[user]['chamada'] -= 1
-                    print(f"Enviando mensagem para {user}")
-                    await sleep(20)
-                if temporizador_user[user]['chamada'] == 0:
-                    temporizador_user.pop(user, None)
+            elif not dados['msg2'] and dados['tempo'] <= 0:
+                await bot.send_message(user, mensagens[idioma]['msg2'])
+                temporizador_user[user]['msg2'] = True
+                temporizador_user[user]['tempo'] += 3600 * 2  # Aguarda 2 horas
 
+            elif not dados['msg3'] and dados['tempo'] <= 0:
+                await bot.send_message(user, mensagens[idioma]['msg3'])
+                temporizador_user[user]['msg3'] = True
+                temporizador_user[user]['tempo'] += 3600 * 3  # Aguarda 3 horas
 
+            elif not dados['msg4'] and dados['tempo'] <= 0:
+                await bot.send_message(user, mensagens[idioma]['msg4'])
+                temporizador_user[user]['msg4'] = True
+                temporizador_user[user]['tempo'] += 20  # Aguarda 20 segundos
+
+            # Remove o usuário quando todas as mensagens foram enviadas
+            if all([dados['msg1'], dados['msg2'], dados['msg3'], dados['msg4']]):
+                temporizador_user.pop(user, None)
+
+        # Intervalo entre cada iteração
+        await asyncio.sleep(10)
 
 bot = AsyncTeleBot(config('TELEGRAM_KEY_TEST'))
 
