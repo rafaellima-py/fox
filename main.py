@@ -13,10 +13,12 @@ from random import randint
 mensagens = {}
 temporizador_user = {}
 user_plano = {}
-admin = '6721447659'
+admin =   '6721447659' #'673195223'
 user_images = {}
 canal =  '-1002411773802'#'@SecretinhoOficial'
 historico_previas = {}
+travar_disparo = {}
+mensagens_broadcast = {}
 async def set_tempo(id):
     
     tempo = 100
@@ -122,6 +124,7 @@ async def verificar_assinaturas():
 
 
 async def temporizador():
+    global temporizador_user
     mensagens = {
     'portugues': {
         'msg1': 'Olá! 🎯 Está por aí? Temos muito conteúdo quente esperando por você no VIP! Não perca a chance de voltar e curtir tudo em primeira mão. 😏🔥',
@@ -286,15 +289,18 @@ async def list_products(message,idioma):
 async def show_plan(message, plan):
     user_id = message.from_user.id
     idioma = Usuario().ver_idioma(str(user_id))
-    
-    
-    print(idioma, user_id)
-    
-   
-    if not historico_previas[user_id]:
-        await show_previas(message)
+    await reset_tempo(user_id)
+    await delete_mensagem_historico(user_id)
+    global mensagens
+    global historico_previas
+
+    if user_id not in historico_previas.keys():
         historico_previas[user_id] = True
-    await bot.send_message(chat_id=user_id, text=language[idioma][plan])
+        await show_previas(message)
+        historico_previas[user_id] = False
+
+    else:
+        print(f"nao enviou previa {historico_previas}")
         
     markup = InlineKeyboardMarkup(row_width=2)
     bizum_bt = InlineKeyboardButton(language[idioma]['bizum'], callback_data='cb_bisum')
@@ -304,22 +310,41 @@ async def show_plan(message, plan):
     paypal_bt = InlineKeyboardButton('Pague via Paypal', callback_data='cb_paypal')
     revolut_bt = InlineKeyboardButton(language[idioma]['bt_revolut'], callback_data='cb_revolut' )
     bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
-    if idioma != 'portugues_br':
-        markup.add(bizum_bt, mbway_bt, paypal_bt, revolut_bt, bt_suporte, voltar_bt)
-        await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
-    else:
-        markup.add(pix_bt,revolut_bt, paypal_bt, bt_suporte, voltar_bt)
-        await bot.send_message(user_id, language[idioma]['plano'], reply_markup=markup)
+    
+    plano = user_plano[user_id]['plano']
 
+    if plano == 'semanal':
+        bt_voltar = InlineKeyboardButton(language[idioma]['voltar_mensal'], callback_data='pl_mensal')
+        markup.add(bt_voltar)
+    
+    elif plano == 'mensal':
+        bt_voltar = InlineKeyboardButton(language[idioma]['voltar_trimestral'], callback_data='pl_trimestral')
+        markup.add(bt_voltar)
+
+    elif plano == 'trimestral':
+        bt_voltar = InlineKeyboardButton(language[idioma]['voltar_mensal'], callback_data='pl_mensal')
+
+        markup.add(bt_voltar)
+    
+    if idioma != 'portugues_br':
+        markup.add(bizum_bt, mbway_bt, paypal_bt, revolut_bt, bt_suporte)
+        
+        msg = await bot.send_message(chat_id=user_id, text= language[idioma]['selecionado'] + language[idioma][plan], reply_markup=markup)
+        await registro_historico(msg, user_id)
+    else:
+        markup.add(pix_bt,revolut_bt, paypal_bt, bt_suporte)
+        
+        msg = await bot.send_message(chat_id=user_id, text= language[idioma]['selecionado'] + language[idioma][plan], reply_markup=markup)        
+        await registro_historico(msg, user_id)
 
 async def show_previas(message):
     user_id = message.from_user.id
     idioma = Usuario().ver_idioma(str(user_id))
-    
-    
-    with open(f'sources/previa{randint(1, 2)}.mp4', 'rb') as f:
-        await bot.send_video(user_id, f, caption=language[idioma]['previa'])
+    if historico_previas[user_id]:
         
+        with open(f'sources/previa{randint(1, 2)}.mp4', 'rb') as f:
+            await bot.send_video(user_id, f, caption=language[idioma]['previa'])
+            
 
 @bot.callback_query_handler(func=lambda call: True)
 async def callback(call):
@@ -349,10 +374,8 @@ async def callback(call):
             await wellcome_new_user(call.message, str(call.from_user.id))
         
         case 'pl_semanal':
-            #await bot.delete_message(call.message.chat.id, call.message.id)
-            await bot.delete_message(call.message.chat.id, call.message.id)
             idioma = Usuario().ver_idioma(str(call.from_user.id))
-            await show_plan(call, 'semanal')
+            print('entrou')
             user_plano[call.from_user.id] = {
             'nome': call.from_user.first_name,
             'username': call.from_user.username,
@@ -361,11 +384,11 @@ async def callback(call):
             'preco': 'None'
         
     }
+            await show_plan(call, 'semanal')
             print(user_plano)
 
         case 'pl_mensal':
-            await bot.delete_message(call.message.chat.id, call.message.id)
-            await show_plan(call, 'mensal')
+            
             await reset_tempo(call.from_user.id)
             idioma = Usuario().ver_idioma(str(call.from_user.id))
            
@@ -374,14 +397,13 @@ async def callback(call):
             'username': call.from_user.username,
             'idioma': idioma,
             'plano': 'mensal',
-            'preco': None
-        
+            'preco': None    
     }        
+            await show_plan(call, 'mensal')
             print(user_plano)
+        
         case 'pl_trimestral':
-            await bot.delete_message(call.message.chat.id, call.message.id)
-            await reset_tempo(call.from_user.id)
-            await show_plan(call, 'trimestral')
+            await reset_tempo(call.from_user.id)            
             idioma = Usuario().ver_idioma(str(call.from_user.id))
         
             user_plano[call.from_user.id] = {
@@ -389,10 +411,10 @@ async def callback(call):
             'username': call.from_user.username,
             'idioma': idioma,
             'plano': 'trimestral',
-            'preco': None
-        
-    }      
+            'preco': None}      
             print(user_plano)
+            await show_plan(call, 'trimestral')
+
 
         case 'cb_bisum':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
@@ -453,9 +475,76 @@ async def callback(call):
         case 'voltar':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             
-            await bot.delete_message(call.message.chat.id, call.message.message_id)
+            #await bot.delete_message(call.message.chat.id, call.message.message_id)
             await reset_tempo(call.from_user.id)
             await list_products(call.message, idioma)
+        
+        case 'visualizar':
+            user_id = call.from_user.id
+            mensagem = mensagens_broadcast.get(user_id)
+            markup = InlineKeyboardMarkup(row_width=2)
+            markup.add(InlineKeyboardButton('Enviar', callback_data='enviar'))
+            print(mensagem)
+            if not mensagem:
+                await bot.send_message(user_id, 'Nenhuma mensagem salva. Use /disparar para começar.')
+                return
+
+            # Exibe o conteúdo dependendo do tipo
+            if mensagem['type'] == 'text':
+                await bot.send_message(user_id, mensagem['content'], reply_markup=markup)
+            elif mensagem['type'] == 'photo':
+                await bot.send_photo(user_id, mensagem['content'], caption=mensagem.get('caption'), reply_markup=markup)
+            elif mensagem['type'] == 'video':
+                await bot.send_video(user_id, mensagem['content'], caption=mensagem.get('caption'), reply_markup=markup)
+            else:
+                await bot.send_message(user_id, 'Tipo de mensagem desconhecido.')
+        
+        case 'enviar':
+    
+            user_id = call.from_user.id
+            mensagem = mensagens_broadcast.get(user_id)
+
+            if not mensagem:
+                await bot.send_message(user_id, 'Nenhuma mensagem para enviar.')
+                return
+
+            usuario = Usuario()
+            users = usuario.get_id_nao_assinantes()
+
+            if not users:
+                await bot.send_message(user_id, 'Nenhum usuário para enviar a mensagem.')
+                return
+
+            qtd_mensagens = 0
+            lote_tamanho = 10
+            intervalo = 2
+
+            # Envio em lotes
+            for i in range(0, len(users), lote_tamanho):
+                lote = users[i:i + lote_tamanho]
+
+                for user in lote:
+                    try:
+                        if mensagem['type'] == 'text':
+                            await bot.send_message(user['id'], mensagem['content'])
+                        elif mensagem['type'] == 'photo':
+                            await bot.send_photo(user['id'], mensagem['content'], caption=mensagem.get('caption'))
+                        elif mensagem['type'] == 'video':
+                            await bot.send_video(user['id'], mensagem['content'], caption=mensagem.get('caption'))
+                        qtd_mensagens += 1
+                    except Exception as e:
+                        print(f"Erro ao enviar para {user['id']}: {e}")
+                        continue
+
+                await asyncio.sleep(intervalo)
+
+        # Notifica o administrador
+            await bot.send_message(user_id, f"Você enviou a mensagem para {qtd_mensagens} usuários!")
+                    
+
+
+       
+       
         #--------------- callback para comprovantes manuais ------------------
           # Extrair o message_id da callback data
     message_id = int(call.data.split('_')[1])
@@ -485,6 +574,26 @@ async def callback(call):
     # Excluir a foto dos registros (opcional)
     user_images.pop(message_id, None)
 
+
+
+async def registro_historico(mensagem, id_user):
+    global mensagens
+    if id_user not in mensagens.keys():
+        mensagens[id_user] = []
+
+    mensagens[id_user].append(mensagem)
+    print(mensagens)
+
+async def delete_mensagem_historico(id_user):
+    global mensagens
+    if id_user in mensagens.keys():
+        items = mensagens[id_user]
+        if len(items) > 0:
+            for item in items:
+                try:
+                    await bot.delete_message(item.chat.id, item.message_id)
+                except Exception as e:
+                    pass
 
 
 async def criar_assinatura(user_id):
@@ -541,27 +650,111 @@ async def criar_assinatura(user_id):
     temporizador_user.pop(user_id, None)
 
 
-@bot.message_handler(content_types=['photo'])
-async def handle_photo(message):
+
+@bot.message_handler(commands=['status'])
+async def status(message):
     if message.chat.type == 'private':
-        await reset_tempo(message.from_user.id)
-        user_id = message.from_user.id  # Obtém o ID do usuário que enviou a imagem
-        user_images[message.message_id] = user_id  # Armazena o ID do usuário usando message_id como chave
+        id_user = message.from_user.id
+        print(id_user)
+        idioma = Usuario().ver_idioma(str(id_user))
+        print(idioma)
+        if idioma != None:
+            assinatura = Usuario().status_assinatura(str(id_user))
+            agora = datetime.datetime.utcnow()
+            expiracao = assinatura['expira']
+            dias = expiracao - agora
+            
+            
+            
+            if assinatura:
+                if idioma =='portugues' or idioma == 'portugues_br':
+                    await bot.send_message(message.chat.id, f'''
+
+Criado: {datetime.datetime.strftime(assinatura["criado"], '%d/%m/%Y : %H:%M')}
+
+Expira: {datetime.datetime.strftime(assinatura["expira"], '%d/%m/%Y : %H:%M')}
+
+Tempo restante: {str(dias.days)} dias
+                
         
-        await bot.send_message(message.chat.id, 'Sending to admin...')
-        
-        # Encaminhar a foto para o administrador
-        await bot.forward_message(admin, message.chat.id, message.message_id)
-        
-        # Criar botões de Aceitar/Cancelar
-        botoes = InlineKeyboardMarkup(row_width=2)
-        aceitar = InlineKeyboardButton('Aceitar', callback_data=f'aceitar_{message.message_id}')
-        cancelar = InlineKeyboardButton('Cancelar', callback_data=f'cancelar_{message.message_id}')
-        botoes.add(aceitar, cancelar)
-        
-        # Enviar a mensagem para o admin com os botões
-        await bot.send_message(admin, 'Comprovante recebido. Aceitar ou Cancelar?', reply_markup=botoes)
+                ''',)
+                
+                if idioma == 'espanhol':
+                    await bot.send_message(message.chat.id, f'''
+ 
+Creada: {datetime.datetime.strftime(assinatura["criado"], '%d/%m/%Y : %H:%M')}
+
+Expira: {datetime.datetime.strftime(assinatura["expira"], '%d/%m/%Y : %H:%M')}
+
+Tiempo restante: {str(dias.days)} dias
+ 
+ 
+ 
+ 
+ ''')
+            else:
+                if idioma == 'portugues' or idioma == 'portugues_br':
+                    await bot.send_message(message.chat.id, 'Você não possui uma assinatura ativa, assine um plano /start')
+                if idioma == 'espanhol':
+                    await bot.send_message(message.chat.id, 'No tienes una suscripción activa, suscríbete a un plan /start')
+
+
+
+
+
+@bot.message_handler(content_types=['photo', 'video', 'text'])
+async def handle_photo(message):
+    if str(message.from_user.id) == str(admin):
+            user_id = message.from_user.id
+            print(mensagens_broadcast)
+                # Determina o tipo de conteúdo recebido
+            if message.content_type == 'text':
+                mensagens_broadcast[user_id] = {'type': 'text', 'content': message.text, 'caption': None}
+                print(mensagens_broadcast)
+            elif message.content_type == 'photo':
+                photo_id = message.photo[-1].file_id  # Maior resolução
+                mensagens_broadcast[user_id] = {'type': 'photo', 'content': photo_id, 'caption': message.caption}
+            elif message.content_type == 'video':
+                video_id = message.video.file_id
+                mensagens_broadcast[user_id] = {'type': 'video', 'content': video_id, 'caption': message.caption}
+            else:
+                await bot.send_message(user_id, 'Tipo de mensagem não suportado.')
+                return
+
+            # Finaliza o travamento e apresenta os botões de ação
+            travar_disparo[user_id] = False
+            markup = InlineKeyboardMarkup(row_width=2)
+            bt_enviar = InlineKeyboardButton('Enviar', callback_data='enviar')
+            bt_visualizar = InlineKeyboardButton('Visualizar', callback_data='visualizar')
+            markup.add(bt_enviar, bt_visualizar)
+
+            await bot.send_message(
+                user_id,
+                'Sua mensagem foi salva! Escolha uma ação abaixo:',
+                reply_markup=markup
+            )
+
+    else:
+        if message.chat.type == 'private':
+            await reset_tempo(message.from_user.id)
+            user_id = message.from_user.id  # Obtém o ID do usuário que enviou a imagem
+            user_images[message.message_id] = user_id  # Armazena o ID do usuário usando message_id como chave
+            
+            await bot.send_message(message.chat.id, 'Sending to admin...')
+            
+            # Encaminhar a foto para o administrador
+            await bot.forward_message(admin, message.chat.id, message.message_id)
+            
+            # Criar botões de Aceitar/Cancelar
+            botoes = InlineKeyboardMarkup(row_width=2)
+            aceitar = InlineKeyboardButton('Aceitar', callback_data=f'aceitar_{message.message_id}')
+            cancelar = InlineKeyboardButton('Cancelar', callback_data=f'cancelar_{message.message_id}')
+            botoes.add(aceitar, cancelar)
+            
+            # Enviar a mensagem para o admin com os botões
+            await bot.send_message(admin, 'Comprovante recebido. Aceitar ou Cancelar?', reply_markup=botoes)
     
+
 
 
 async def main():

@@ -150,6 +150,12 @@ class Usuario:
             return True
         else:
             return False
+    def get_id_nao_assinantes(self):
+        usuarios = self.collection.find({'qt_assinatura': {'$lt': 1}})
+        return list(usuarios)
 
 usuario = Usuario()
-#usuario.insert_admin(str(7124703290))
+
+users = usuario.get_id_nao_assinantes()
+for user in users:
+    print(user['nome'])
