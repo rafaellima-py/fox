@@ -656,48 +656,44 @@ async def status(message):
     if message.chat.type == 'private':
         id_user = message.from_user.id
         print(id_user)
-        idioma = Usuario().ver_idioma(str(id_user))
-        print(idioma)
-        if idioma != None:
-            assinatura = Usuario().status_assinatura(str(id_user))
-            agora = datetime.datetime.utcnow()
-            expiracao = assinatura['expira']
-            dias = expiracao - agora
-            
-            
-            
-            if assinatura:
-                if idioma =='portugues' or idioma == 'portugues_br':
-                    await bot.send_message(message.chat.id, f'''
-
-Criado: {datetime.datetime.strftime(assinatura["criado"], '%d/%m/%Y : %H:%M')}
-
-Expira: {datetime.datetime.strftime(assinatura["expira"], '%d/%m/%Y : %H:%M')}
-
-Tempo restante: {str(dias.days)} dias
-                
         
-                ''',)
+        idioma = Usuario().ver_idioma(str(id_user))
+        print(f"Idioma detectado: {idioma}")
+        
+        if idioma is not None:
+            assinatura = Usuario().status_assinatura(str(id_user))
+            if assinatura is not None:
+                agora = datetime.datetime.utcnow()
                 
-                if idioma == 'espanhol':
-                    await bot.send_message(message.chat.id, f'''
- 
-Creada: {datetime.datetime.strftime(assinatura["criado"], '%d/%m/%Y : %H:%M')}
-
+                # Validação para a chave 'expira'
+                if 'expira' in assinatura:
+                    expiracao = assinatura['expira']
+                    dias = expiracao - agora
+                    
+                    if idioma in ['portugues', 'portugues_br']:
+                        await bot.send_message(message.chat.id, f'''
+Criado: {datetime.datetime.strftime(assinatura["criado"], '%d/%m/%Y : %H:%M')}
 Expira: {datetime.datetime.strftime(assinatura["expira"], '%d/%m/%Y : %H:%M')}
+Tempo restante: {str(dias.days)} dias
+''')
 
+                    elif idioma == 'espanhol':
+                        await bot.send_message(message.chat.id, f'''
+Creada: {datetime.datetime.strftime(assinatura["criado"], '%d/%m/%Y : %H:%M')}
+Expira: {datetime.datetime.strftime(assinatura["expira"], '%d/%m/%Y : %H:%M')}
 Tiempo restante: {str(dias.days)} dias
- 
- 
- 
- 
- ''')
+''')
+                else:
+                    # Caso a chave 'expira' não exista
+                    await bot.send_message(message.chat.id, 'Erro: Não foi possível determinar a data de expiração.')
             else:
-                if idioma == 'portugues' or idioma == 'portugues_br':
-                    await bot.send_message(message.chat.id, 'Você não possui uma assinatura ativa, assine um plano /start')
-                if idioma == 'espanhol':
-                    await bot.send_message(message.chat.id, 'No tienes una suscripción activa, suscríbete a un plan /start')
-
+                # Caso assinatura seja None
+                if idioma in ['portugues', 'portugues_br']:
+                    await bot.send_message(message.chat.id, 'Você não possui uma assinatura ativa. Assine um plano com /start.')
+                elif idioma == 'espanhol':
+                    await bot.send_message(message.chat.id, 'No tienes una suscripción activa. Suscríbete a un plan con /start.')
+        else:
+            await bot.send_message(message.chat.id, 'Erro: Não foi possível determinar seu idioma.')
 
 
 
