@@ -7,13 +7,14 @@ preco_pt = {
     'semanal': 7.99,
     'mensal': 19.99,
     'trimestral': 39.99,
-   
+    'vitalicio': 54.99,
 }
 
 preco_es = {
     'semanal': 7.99,
     'mensal': 19.99,
     'trimestral': 39.99,
+    'vitalicio': 54.99,
    
 }
 
@@ -22,8 +23,20 @@ preco_br = {
     'semanal': 25.99,
     'mensal': 49.99,
     'trimestral': 79.99,
+    'vitalicio': 99.99,
+
    
 }
+
+
+preco_us = {
+    'semanal': 7.99 + 5,
+    'mensal': 19.99 + 5,
+    'trimestral': 39.99 + 5,
+    'vitalicio': 59.99
+   
+}
+
 
 
 language = {
@@ -59,9 +72,10 @@ language = {
         'expirado': 'Su suscripción ha caducado. Vuelve a firmar un plan. /start.',
         'cta1': 'Quiero suscribirme al vip € 8,00 🔞',
         'plano': 'Elige tu plan',
-        'mensal': '🔞 Mensual € 25.99',
-        'semanal': '🔥 Semanal € 15.99',
-        'trimestral': '😈 Trimestral € 38.99',
+        'mensal': f'🔞 Mensual €{str(preco_es["mensal"])}',
+        'semanal': f'🔥 Semanal €{str(preco_es["semanal"])}',
+        'trimestral': f'😈 Trimestral €{str(preco_es["trimestral"])}',
+        'vitalicio': f'😈 Vitalicio €{str(preco_es["vitalicio"])}',
         'selecionado': 'Seleccionaste el plan',
         'voltar_semanal': '🔞 Quiero el semanal',
         "voltar_mensal": '🔞 Quiero el mensual',
@@ -111,6 +125,7 @@ language = {
         'mensal': f'🔞 Mensal € {str(preco_pt["mensal"])}',
         'semanal': f'🔥 Semanal € {str(preco_pt["semanal"])}',
         'trimestral': f'😈 Trimestral € {str(preco_pt["trimestral"])}',
+        'vitalicio': f'😈 Vitalicio € {str(preco_pt["vitalicio"])}',
         'selecionado': 'Selecionaste o plano',
         'voltar_semanal': '🔞 Quero o semanal',
         "voltar_mensal": '🔞 Quero o mensal',
@@ -160,6 +175,7 @@ language = {
         'mensal': f'🔞 Mensal R$ {str(preco_br["mensal"])}',
         'semanal': f'🔥 Semanal R$ {str(preco_br["semanal"])}',
         'trimestral': f'😈 Trimestral R$ {str(preco_br["trimestral"])}',
+        'vitalicio': f'Vitalicio R$ {str(preco_br["vitalicio"])}',
         'selecionado': 'Você selecionou o plano',
         'voltar_semanal': '🔞 Quero o semanal',
         "voltar_mensal": '🔞 Quero o mensal',        
@@ -172,7 +188,59 @@ language = {
         'bt_suporte': '💬 Suporte',
         'bt_revolut': '💰 Pagar com Revolut',
         
+    },
+
+    "ingles": {
+        "inicio": """
+💎 INCEST+18 🫦
+💎 BREASTFEEDING THE CHILD‼️
+💎 RESTRICTED CONTENT 😈
+💎 LEAKED CELEBRITIES 👀
+💎 NEW +18 👅
+💎 AMATEUR 🔥
+💎 CONTROVERSIAL +18 🥵
+💎 MILF 👵🏻
+💎 LIVES 🎬
+💎 HOODLUMS 🔥
+💎 ANAL 😈
+💎 BLOWJOBS 👄
+""",
+        "inicio2": "Hello, welcome back 🙂",
+        "produtos": "🎟️ Available products 🎟️",
+        "call_interesse": "Are you interested in joining the best porn channel in the world?",
+        "cb_nao_interesse": "Thank you for your interest, see you later 😉",
+        "pg_instrucao": "Make the payment and send a photo of the receipt; it will be sent for approval by an administrator, and you will receive an access link after approval.",
+        "oferta_semanal": "Continue with the weekly plan",
+        "oferta_exclusiva": "I want an exclusive offer",
+        "oferta_apresentacao": "We have an exclusive offer for you: Pay for one more week and get two extra weeks for free.\n\n You will get a total of: 1 month of access for €16,00.",
+        "obrigado": 'Thank you for subscribing.',
+        '5dias': 'Your subscription will expire in 5 days. Renew the plan again /start.',
+        '4dias': 'Your subscription will expire in 4 days. Renew the plan again /start.',
+        '3dias': 'Your subscription will expire in 3 days. Renew the plan again /start.',
+        '2dias': 'Your subscription will expire in 2 days. Renew the plan again /start.',
+        '1dias': 'Your subscription will expire in 1 day. Renew the plan again /start.',
+        '3min': 'Your subscription will expire in 30 minutes. Renew the plan again /start.',
+        'expirado': 'Your subscription has expired. Renew the plan again /start.',
+        'cta1': 'I want to subscribe to VIP € 8,00 🔞',
+        'plano': 'Choose your plan',
+        'mensal': f'🔞 Monthly € {str(preco_us["mensal"])}',
+        'semanal': f'🔥 Weekly € {str(preco_us["semanal"])}',
+        'trimestral': f'😈 Quarterly € {str(preco_us["trimestral"])}',
+        'vitalicio': f'🔥 Forever {str(preco_us["vitalicio"])}',
+        'selecionado': 'You selected the plan',
+        'voltar_semanal': '🔞 I want the weekly plan',
+        "voltar_mensal": '🔞 I want the monthly plan',
+        'voltar_trimestral': '😈 I want the quarterly plan',
+        'mbway': 'Pay with Mbway',
+        'bizum': 'Pay with Bizum',
+        'esperando_pg': 'Waiting for payment...',
+        'previa': '🚧 Check a preview of our exclusive content 🚧',
+        'suporte': '💬 If you have any questions, ask or suggest something, contact us in our support channel.',
+        'bt_suporte': '💬 Support',
+        'bt_revolut': '💰 Pay with Revolut',
     }
+
+    
 }
 
 

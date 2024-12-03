@@ -85,11 +85,12 @@ async def verificar_assinaturas():
             if data_expiracao <= agora and not limite_msg_usuario[id]['expirado']:
                 print(f'{id}: assinatura expirada')
                 try:
-                    Usuario().delete_assinatura(str(id))
                     await bot.kick_chat_member(chat_id=canal, user_id=id)
+                    
                 except Exception as e:
                     print(f"Erro ao excluir usuário {id} do chat {canal}: {e}")
                     continue
+                Usuario().delete_assinatura(str(id))
                 await bot.send_message(id, language[idioma]['expirado'])
                 limite_msg_usuario[id]['expirado'] = True  # Marca como expirada para não repetir a ação
             
@@ -125,6 +126,7 @@ async def verificar_assinaturas():
 
 async def temporizador():
     global temporizador_user
+    global historico_previas
     mensagens = {
     'portugues': {
         'msg1': 'Olá! 🎯 Está por aí? Temos muito conteúdo quente esperando por você no VIP! Não perca a chance de voltar e curtir tudo em primeira mão. 😏🔥',
@@ -145,8 +147,14 @@ async def temporizador():
         'msg3': 'Você ficou ausente por um tempo, mas o conteúdo exclusivo não para de chegar! 🎁 Aproveite agora e se entregue à experiência VIP que só o nosso canal oferece! 🔥',
         'msg4': 'Hey! Tudo bem por aí? 🧐 O VIP está mais quente do que nunca e você ainda pode voltar quando quiser! Acesse agora e veja o que perdeu. 🚀😏',
     
-        }
-}
+        },
+
+    'ingles':{   
+        'msg1': 'Hello! 🎯 Are you there? We have a lot of hot content waiting for you in the VIP! Don’t miss the chance to come back and enjoy everything first-hand. 😏🔥',
+        'msg2': '👀 We missed you! It’s time to regain access to the exclusive content. Come back and enjoy now, we’re waiting for you in the VIP. 😈✨',
+        'msg3': 'You’ve been absent for a while, but exclusive content keeps coming! 🎁 Take advantage now and immerse yourself in the VIP experience that only our channel offers! 🔥',
+        'msg4': 'Hey! How’s everything going? 🧐 The VIP is hotter than ever and you can still come back whenever you want! Access now and see what you’ve missed. 🚀😏',  
+}}
 
     while True:
         for user, dados in list(temporizador_user.items()):
@@ -174,7 +182,7 @@ async def temporizador():
                 await bot.send_message(user, mensagens[idioma]['msg2'])
                 temporizador_user[user]['msg2'] = True
                 temporizador_user[user]['tempo'] += 3600 * 2  # Aguarda 2 horas
-
+                historico_previas[user] = True
             elif not dados['msg3'] and dados['tempo'] <= 0:
                 await bot.send_message(user, mensagens[idioma]['msg3'])
                 temporizador_user[user]['msg3'] = True
@@ -222,8 +230,9 @@ async def start(message):
         Usuario().cadastrar_usuario(usuario)
         language_markup = InlineKeyboardMarkup(row_width=2)
         language_markup.add(InlineKeyboardButton(f'🇵🇹 Português', callback_data='set_language_portugues'))
-        language_markup.add(InlineKeyboardButton(f'🇪🇸 Espanhol', callback_data='set_language_espanhol'))
+        language_markup.add(InlineKeyboardButton(f'🇪🇸 Español', callback_data='set_language_espanhol'))
         language_markup.add(InlineKeyboardButton(f'🇧🇷 Português do Brasil', callback_data='set_language_portugues_br'))
+        language_markup.add(InlineKeyboardButton(f'🇬🇧 English', callback_data='set_language_ingles'))
         await bot.send_message(message.chat.id, 'Choose your language', reply_markup=language_markup)
    
     if usuario_existe:
@@ -232,8 +241,9 @@ async def start(message):
         if Usuario().get_qtd_start(str(message.from_user.id)) > 0 and not idioma:
             language_markup = InlineKeyboardMarkup(row_width=2)
             language_markup.add(InlineKeyboardButton(f'🇵🇹 Português', callback_data='set_language_portugues'))
-            language_markup.add(InlineKeyboardButton(f'🇪🇸 Espanhol', callback_data='set_language_espanhol'))
+            language_markup.add(InlineKeyboardButton(f'🇪🇸 Español', callback_data='set_language_espanhol'))
             language_markup.add(InlineKeyboardButton(f'🇧🇷 Português do Brasil', callback_data='set_language_portugues_br'))
+            language_markup.add(InlineKeyboardButton(f'🇬🇧 English', callback_data='set_language_ingles'))
             await bot.send_message(message.chat.id, 'Choose your language', reply_markup=language_markup)
 
         if qtd_assinatura == 0:
@@ -276,14 +286,16 @@ async def wellcome_new_user(message, id_user):
             await list_products(message, idioma)
 
 async def list_products(message,idioma):
-    
+    global mensagens
     markup = InlineKeyboardMarkup(row_width=2)
     semanal = InlineKeyboardButton(language[idioma]['semanal'], callback_data='pl_semanal')
     mensal = InlineKeyboardButton(language[idioma]['mensal'], callback_data='pl_mensal')
     trimestral = InlineKeyboardButton(language[idioma]['trimestral'], callback_data='pl_trimestral')
-    markup.add(semanal, mensal, trimestral)
-    await bot.send_message(chat_id=message.chat.id, text=language[idioma]['plano'], reply_markup=markup)
+    vitalicio = InlineKeyboardButton(language[idioma]['vitalicio'], callback_data='pl_vitalicio')
+    markup.add(semanal, mensal, trimestral, vitalicio)
 
+    msg = await bot.send_message(chat_id=message.chat.id, text=language[idioma]['plano'], reply_markup=markup)
+    #await registro_historico(msg, message.from_user.id)
 
 
 async def show_plan(message, plan):
@@ -297,7 +309,7 @@ async def show_plan(message, plan):
     if user_id not in historico_previas.keys():
         historico_previas[user_id] = True
         await show_previas(message)
-        historico_previas[user_id] = False
+        
 
     else:
         print(f"nao enviou previa {historico_previas}")
@@ -326,6 +338,13 @@ async def show_plan(message, plan):
 
         markup.add(bt_voltar)
     
+
+    elif plano == 'vitalicio':
+        bt_voltar = InlineKeyboardButton(language[idioma]['voltar_trimestral'], callback_data='pl_trimestral')
+        markup.add(bt_voltar)
+
+
+
     if idioma != 'portugues_br':
         markup.add(bizum_bt, mbway_bt, paypal_bt, revolut_bt, bt_suporte)
         
@@ -338,13 +357,15 @@ async def show_plan(message, plan):
         await registro_historico(msg, user_id)
 
 async def show_previas(message):
+    global historico_previas
+    print(historico_previas)
     user_id = message.from_user.id
     idioma = Usuario().ver_idioma(str(user_id))
-    if historico_previas[user_id]:
+    if historico_previas[user_id] == True:
         
         with open(f'sources/previa{randint(1, 2)}.mp4', 'rb') as f:
             await bot.send_video(user_id, f, caption=language[idioma]['previa'])
-            
+            historico_previas[user_id] = False
 
 @bot.callback_query_handler(func=lambda call: True)
 async def callback(call):
@@ -373,6 +394,12 @@ async def callback(call):
             Usuario().inserir_idioma(str(call.from_user.id), 'portugues_br')
             await wellcome_new_user(call.message, str(call.from_user.id))
         
+        case 'set_language_ingles':
+            await bot.delete_message(call.message.chat.id, call.message.id)
+            Usuario().inserir_idioma(str(call.from_user.id), 'ingles')
+            await wellcome_new_user(call.message, str(call.from_user.id))
+
+            
         case 'pl_semanal':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             print('entrou')
@@ -415,6 +442,18 @@ async def callback(call):
             print(user_plano)
             await show_plan(call, 'trimestral')
 
+        case 'pl_vitalicio':
+            await reset_tempo(call.from_user.id)            
+            idioma = Usuario().ver_idioma(str(call.from_user.id))
+        
+            user_plano[call.from_user.id] = {
+            'nome': call.from_user.first_name,
+            'username': call.from_user.username,
+            'idioma': idioma,
+            'plano': 'vitalicio',
+            'preco': None}      
+            print(user_plano)
+            await show_plan(call, 'vitalicio')
 
         case 'cb_bisum':
             idioma = Usuario().ver_idioma(str(call.from_user.id))
@@ -604,6 +643,8 @@ async def criar_assinatura(user_id):
         expiracao = datetime.datetime.utcnow() + timedelta(days=30)
     elif user_plano[user_id]['plano'] == 'trimestral':
         expiracao = datetime.datetime.utcnow() + timedelta(days=90)
+    elif user_plano[user_id]['plano'] == 'vitalicio':
+        expiracao = datetime.datetime.utcnow() + timedelta(days=120*120)
     id = str(user_id)
     nome = user_plano[user_id]['nome']
     username = user_plano[user_id]['username']
@@ -754,7 +795,7 @@ async def handle_photo(message):
 
 
 async def main():
-    print('Iniciando verificação de assinaturas')
+    #print('Iniciando verificação de assinaturas')
     #asyncio.create_task(verificar_assinaturas())
         
         
