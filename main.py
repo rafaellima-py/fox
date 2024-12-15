@@ -8,12 +8,12 @@ from utils import *
 from asyncio import sleep
 import datetime
 from datetime import timedelta
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatInviteLink
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatInviteLink, ReplyKeyboardMarkup, KeyboardButton
 from random import randint
 mensagens = {}
 temporizador_user = {}
 user_plano = {}
-admin =   '6721447659' #'673195223'
+admin =     '7124703290' #'6721447659' #'673195223'
 user_images = {}
 canal =  '-1002411773802'#'@SecretinhoOficial'
 historico_previas = {}
@@ -91,33 +91,57 @@ async def verificar_assinaturas():
                     print(f"Erro ao excluir usuário {id} do chat {canal}: {e}")
                     continue
                 Usuario().delete_assinatura(str(id))
-                await bot.send_message(id, language[idioma]['expirado'])
+                try:
+                    await bot.send_message(id, language[idioma]['expirado'])
+                except Exception as e:
+                    print(e, 'usuario nao recebeu a mensagem de expirado')
+                    continue
                 limite_msg_usuario[id]['expirado'] = True  # Marca como expirada para não repetir a ação
             
             
             elif data_all[id]['restante_d'] == 5 and not limite_msg_usuario[id]['avisado_5_dias']:
-                await bot.send_message(id, language[idioma]['5dias'])
+                try:
+                    await bot.send_message(id, language[idioma]['5dias'])
+                except Exception as e:
+                    print(e, 'usuario nao recebeu a mensagem de 5 dias')
+                    continue
                 limite_msg_usuario[id]['avisado_5_dias'] = True  # Marca que o aviso foi enviado
                 print(f'{id}: aviso de expiração em 5 dias enviado')
             
             elif data_all[id]['restante_d'] == 4 and not limite_msg_usuario[id]['avisado_4_dias']:
-                await bot.send_message(id, language[idioma]['4dias'])
+                try:
+                    await bot.send_message(id, language[idioma]['4dias'])
+                except Exception as e:
+                    print(e, 'Erro ao enviar mensagem de 4 dias')
+                    continue
                 limite_msg_usuario[id]['avisado_4_dias'] = True  # Marca que o aviso foi enviado
                 print(f'{id}: aviso de expiração em 4 dias enviado')
             
             # Verifica se a assinatura vai expirar em 3 dias
             elif data_all[id]['restante_d'] == 3 and not limite_msg_usuario[id]['avisado_3_dias']:
-                await bot.send_message(id, language[idioma]['3dias'])
+                try:
+                    await bot.send_message(id, language[idioma]['3dias'])
+                except:
+                    print(e, 'erro ao enviar mensagem de 3 dias')
+                    continue
                 limite_msg_usuario[id]['avisado_3_dias'] = True  # Marca que o aviso foi enviado
                 print(f'{id}: aviso de expiração em 3 dias enviado')
             
             elif data_all[id]['restante_d'] == 2 and not limite_msg_usuario[id]['avisado_2_dias']:
-                await bot.send_message(id, language[idioma]['2dias'])
+                try:
+                    await bot.send_message(id, language[idioma]['2dias'])
+                except Exception as e:
+                    print(e, 'Erro ao mandar a mensagem de 2 dias')
+                    continue
                 limite_msg_usuario[id]['avisado_2_dias'] = True  # Marca que o aviso foi enviado
                 print(f'{id}: aviso de expiração em 2 dias enviado')
             
             elif data_all[id]['restante_d'] == 1 and not limite_msg_usuario[id]['avisado_1_dia']:
-                await bot.send_message(id, language[idioma]['1dias'])
+                try:
+                    await bot.send_message(id, language[idioma]['1dias'])
+                except Exception as e:
+                    print(e, 'erro ao mandar mensagem de 1 dia')
+                    continue
                 limite_msg_usuario[id]['avisado_1_dia'] = True  # Marca que o aviso foi enviado
                 print(f'{id}: aviso de expiração em 1 dia enviado')
                 
@@ -263,29 +287,34 @@ async def wellcome_new_user(message, id_user):
     idioma = Usuario().ver_idioma(str(id_user))
     #print(idioma)
     if idioma == 'espanhol':
-        with open('sources/espanhol.jpeg', 'rb') as f:
+        with open('sources/vsl2.mp4', 'rb') as f:
             await bot.send_photo(message.chat.id, f)
-            await bot.send_message(message.chat.id, language[idioma]['inicio'])
+            #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(message, idioma)
     if idioma == 'portugues':
-        with open('sources/portugues.jpeg', 'rb') as f:
+        with open('sources/vsl2.mp4', 'rb') as f:
             await bot.send_photo(message.chat.id, f)
-            await bot.send_message(message.chat.id, language[idioma]['inicio'])
+            #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(message, idioma)
     
     if idioma == 'ingles':
-        with open('sources/ingles.jpeg', 'rb') as f:
+        with open('sources/vsl2.mp4', 'rb') as f:
             await bot.send_photo(message.chat.id, f)
-            await bot.send_message(message.chat.id, language[idioma]['inicio'])
+            #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(message, idioma)
 
     if idioma == 'portugues_br':
-        with open('sources/portugues.jpeg', 'rb') as f:
+        with open('sources/vsl2.mp4', 'rb') as f:
             await bot.send_photo(message.chat.id, f)
-            await bot.send_message(message.chat.id, language[idioma]['inicio'])
+            #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(message, idioma)
 
-async def list_products(message,idioma):
+@bot.message_handler(commands=['plans', 'planos', 'plan', ])
+async def list_products(message,idioma=None):
+    idioma = Usuario().ver_idioma(str(message.from_user.id))
+    if not idioma:
+           await start(message)
+
     global mensagens
     markup = InlineKeyboardMarkup(row_width=2)
     semanal = InlineKeyboardButton(language[idioma]['semanal'], callback_data='pl_semanal')
@@ -319,9 +348,9 @@ async def show_plan(message, plan):
     mbway_bt = InlineKeyboardButton(language[idioma]['mbway'], callback_data='cb_mbway')
     voltar_bt = InlineKeyboardButton('Back', callback_data='voltar')
     pix_bt = InlineKeyboardButton('Pague via Pix', callback_data='cb_pix')
-    paypal_bt = InlineKeyboardButton('Pague via Paypal', callback_data='cb_paypal')
+    paypal_bt = InlineKeyboardButton(language[idioma]['bt_paypal'], callback_data='cb_paypal')
     revolut_bt = InlineKeyboardButton(language[idioma]['bt_revolut'], callback_data='cb_revolut' )
-    bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+    bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxagency_ltda')
     
     plano = user_plano[user_id]['plano']
 
@@ -345,17 +374,26 @@ async def show_plan(message, plan):
 
 
 
-    if idioma != 'portugues_br':
-        markup.add(bizum_bt, mbway_bt, paypal_bt, revolut_bt, bt_suporte)
-        
+    if idioma == 'portugues_br':
+        markup.add(pix_bt, paypal_bt, revolut_bt, bt_suporte) 
         msg = await bot.send_message(chat_id=user_id, text= language[idioma]['selecionado'] + language[idioma][plan], reply_markup=markup)
         await registro_historico(msg, user_id)
-    else:
-        markup.add(pix_bt,revolut_bt, paypal_bt, bt_suporte)
-        
-        msg = await bot.send_message(chat_id=user_id, text= language[idioma]['selecionado'] + language[idioma][plan], reply_markup=markup)        
+
+    elif idioma == 'ingles':
+        markup.add(paypal_bt, revolut_bt, bt_suporte) 
+        msg = await bot.send_message(chat_id=user_id, text= language[idioma]['selecionado'] + language[idioma][plan], reply_markup=markup)
+        await registro_historico(msg, user_id)
+    
+    elif idioma == 'espanhol':
+        markup.add(bizum_bt, mbway_bt, paypal_bt, revolut_bt, bt_suporte) 
+        msg = await bot.send_message(chat_id=user_id, text= language[idioma]['selecionado'] + language[idioma][plan], reply_markup=markup)
         await registro_historico(msg, user_id)
 
+    elif idioma == 'portugues':
+        markup.add(bizum_bt, mbway_bt, paypal_bt, revolut_bt, bt_suporte) 
+        msg = await bot.send_message(chat_id=user_id, text= language[idioma]['selecionado'] + language[idioma][plan], reply_markup=markup)
+        await registro_historico(msg, user_id)
+    
 async def show_previas(message):
     global historico_previas
     print(historico_previas)
@@ -459,7 +497,7 @@ async def callback(call):
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
             markup = InlineKeyboardMarkup(row_width=2)
-            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxagency_ltda')
             markup.add(bt_suporte)
             await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
             chave_pg = "Chave: 604338509"
@@ -470,7 +508,7 @@ async def callback(call):
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
             markup = InlineKeyboardMarkup(row_width=2)
-            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxagency_ltda')
             markup.add(bt_suporte)
             await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
             chave_pg = "Chave: 933466639"
@@ -482,7 +520,7 @@ async def callback(call):
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
             markup = InlineKeyboardMarkup(row_width=2)
-            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxagency_ltda')
             markup.add(bt_suporte)
             await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
             chave_pg = "Chave: c2e51e73-813e-45f6-87dd-e7b70f859870"
@@ -494,7 +532,7 @@ async def callback(call):
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
             markup = InlineKeyboardMarkup(row_width=2)
-            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxagency_ltda')
             pagar_revolut = InlineKeyboardButton(language[idioma]['bt_revolut'], url='https://revolut.me/cauad')
             markup.add(pagar_revolut, bt_suporte )
             await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
@@ -504,7 +542,7 @@ async def callback(call):
             idioma = Usuario().ver_idioma(str(call.from_user.id))
             await reset_tempo(call.from_user.id)
             markup = InlineKeyboardMarkup(row_width=2)
-            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxltda02')
+            bt_suporte = InlineKeyboardButton(language[idioma]['bt_suporte'], url='https://t.me/foxagency_ltda')
             markup.add(bt_suporte)
             await bot.send_message(call.from_user.id, language[idioma]['pg_instrucao'] + language[idioma]['suporte'], reply_markup=markup)
             chave_pg = "Chave: foxltda00@gmail.com"
@@ -557,7 +595,8 @@ async def callback(call):
             qtd_mensagens = 0
             lote_tamanho = 10
             intervalo = 2
-
+            botoes = ReplyKeyboardMarkup(resize_keyboard=True)
+            botoes.add(KeyboardButton(text='/plans'))
             # Envio em lotes
             for i in range(0, len(users), lote_tamanho):
                 lote = users[i:i + lote_tamanho]
@@ -565,11 +604,14 @@ async def callback(call):
                 for user in lote:
                     try:
                         if mensagem['type'] == 'text':
-                            await bot.send_message(user['id'], mensagem['content'])
+                            await bot.send_message(user['id'], mensagem['content'], reply_markup=botoes)
                         elif mensagem['type'] == 'photo':
-                            await bot.send_photo(user['id'], mensagem['content'], caption=mensagem.get('caption'))
+                            await bot.send_photo(user['id'], mensagem['content'],
+                                                  caption=mensagem.get('caption'), reply_markup=botoes)
+                            
                         elif mensagem['type'] == 'video':
-                            await bot.send_video(user['id'], mensagem['content'], caption=mensagem.get('caption'))
+                            await bot.send_video(user['id'], mensagem['content'],
+                                                  caption=mensagem.get('caption'), reply_markup=botoes)
                         qtd_mensagens += 1
                     except Exception as e:
                         print(f"Erro ao enviar para {user['id']}: {e}")
@@ -692,6 +734,13 @@ async def criar_assinatura(user_id):
 
 
 
+
+
+@bot.message_handler(commands=['id'])
+async def showid(message):
+    await bot.send_message(message.chat.id, message.from_user.id)
+    print(message.from_user.id)
+
 @bot.message_handler(commands=['status'])
 async def status(message):
     if message.chat.type == 'private':
@@ -757,6 +806,7 @@ async def handle_photo(message):
             else:
                 await bot.send_message(user_id, 'Tipo de mensagem não suportado.')
                 return
+    
 
             # Finaliza o travamento e apresenta os botões de ação
             travar_disparo[user_id] = False
@@ -772,7 +822,11 @@ async def handle_photo(message):
             )
 
     else:
-        if message.chat.type == 'private':
+        if message.content_type == 'text':
+            idioma = Usuario().ver_idioma(str(message.from_user.id))
+            await list_products(message, idioma)
+
+        elif message.chat.type == 'private':
             await reset_tempo(message.from_user.id)
             user_id = message.from_user.id  # Obtém o ID do usuário que enviou a imagem
             user_images[message.message_id] = user_id  # Armazena o ID do usuário usando message_id como chave
@@ -794,6 +848,9 @@ async def handle_photo(message):
 
 
 
+
+
+
 async def main():
     #print('Iniciando verificação de assinaturas')
     #asyncio.create_task(verificar_assinaturas())
@@ -811,5 +868,3 @@ if __name__ == '__main__':
         asyncio.run(main())
     except Exception as e:
         print(e)
-
-        

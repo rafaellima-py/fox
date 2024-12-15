@@ -71,11 +71,11 @@ language = {
         '3min': 'Su suscripción caducará en 30 min. Vuelve a firmar un plan. /start.',
         'expirado': 'Su suscripción ha caducado. Vuelve a firmar un plan. /start.',
         'cta1': 'Quiero suscribirme al vip € 8,00 🔞',
-        'plano': 'Elige tu plan',
-        'mensal': f'🔞 Mensual €{str(preco_es["mensal"])}',
-        'semanal': f'🔥 Semanal €{str(preco_es["semanal"])}',
-        'trimestral': f'😈 Trimestral €{str(preco_es["trimestral"])}',
-        'vitalicio': f'😈 Vitalicio €{str(preco_es["vitalicio"])}',
+        'plano': 'Elige tu plan 👇🏻👇🏻👇🏻👇🏻👇🏻',
+        'mensal': f'🔞 1 Mes €{str(preco_es["mensal"])}',
+        'semanal': f'🔥 1 Semana €{str(preco_es["semanal"])}',
+        'trimestral': f'😈 3 meses €{str(preco_es["trimestral"])}',
+        'vitalicio': f'😈 Por vida €{str(preco_es["vitalicio"])}',
         'selecionado': 'Seleccionaste el plan',
         'voltar_semanal': '🔞 Quiero el semanal',
         "voltar_mensal": '🔞 Quiero el mensual',
@@ -84,9 +84,10 @@ language = {
         'bizum': 'Pagar con Bizum',
         'esperando_pg': 'Esperando pago...',
         'previa': '🚧 Confira una previa del nuestro contenido exclusivo 🚧',
-        'suporte': '💬 Si tienes alguna duda, pregunta o sugerencia, contáctanos en nuestro canal de suporte.',
-        'bt_suporte': '💬 Suporte',
+        'suporte': '💬 Si tienes alguna duda, pregunta o sugerencia, contáctanos en nuestro canal de soporte.',
+        'bt_suporte': '💬 Soporte',
         'bt_revolut': '💰 Pagar con Revolut',
+        'bt_paypal': '💰 Pagar con Paypal'
     },
     
     "portugues": {
@@ -121,10 +122,10 @@ language = {
         '3min': 'A sua subscrição expirará em 30 minutos. Renove o plano novamente /start.',
         'expirado': 'A sua subscrição expirou. Renove o plano novamente /start.',
         'cta1': 'Quero subscrever ao VIP € 8,00 🔞',
-        'plano': 'Escolha o seu plano',
-        'mensal': f'🔞 Mensal € {str(preco_pt["mensal"])}',
-        'semanal': f'🔥 Semanal € {str(preco_pt["semanal"])}',
-        'trimestral': f'😈 Trimestral € {str(preco_pt["trimestral"])}',
+        'plano': 'Escolha o seu plano 👇🏻👇🏻👇🏻👇🏻👇🏻',
+        'mensal': f'🔞 1 Mês €{str(preco_pt["mensal"])}',
+        'semanal': f'🔥 1 Semana €{str(preco_pt["semanal"])}',
+        'trimestral': f'😈 3 Meses €{str(preco_pt["trimestral"])}',
         'vitalicio': f'😈 Vitalicio € {str(preco_pt["vitalicio"])}',
         'selecionado': 'Selecionaste o plano',
         'voltar_semanal': '🔞 Quero o semanal',
@@ -137,6 +138,7 @@ language = {
         'suporte': '💬 Se você tiver alguma dúvida, pergunte ou sugira algo, entre em contato no nosso canal de suporte.',
         'bt_suporte': '💬 Suporte',
         'bt_revolut': '💰 Pagar com Revolut',
+        'bt_paypal': '💰 Pagar com Paypal'
     },
     
     "portugues_br": {
@@ -171,11 +173,11 @@ language = {
         '3min': 'Sua assinatura expirará em 30 minutos. Renove o plano novamente /start.',
         'expirado': 'Sua assinatura expirou. Renove o plano novamente /start.',
         'cta1': 'Quero assinar o VIP € 8,00 🔞',
-        'plano': 'Escolha seu plano',
-        'mensal': f'🔞 Mensal R$ {str(preco_br["mensal"])}',
-        'semanal': f'🔥 Semanal R$ {str(preco_br["semanal"])}',
-        'trimestral': f'😈 Trimestral R$ {str(preco_br["trimestral"])}',
-        'vitalicio': f'Vitalicio R$ {str(preco_br["vitalicio"])}',
+        'plano': 'Escolha seu plano 👇🏻👇🏻👇🏻👇🏻👇🏻',
+        'mensal': f'🔞 1 Mês R${str(preco_br["mensal"])}',
+        'semanal': f'🔥 1 Semana R${str(preco_br["semanal"])}',
+        'trimestral': f'😈 3 Meses R$ {str(preco_br["trimestral"])}',
+        'vitalicio': f'😈 Vitalicio R$ {str(preco_br["vitalicio"])}',
         'selecionado': 'Você selecionou o plano',
         'voltar_semanal': '🔞 Quero o semanal',
         "voltar_mensal": '🔞 Quero o mensal',        
@@ -187,6 +189,8 @@ language = {
         'suporte': '💬 Se você tiver alguma dúvida, pergunte ou sugira algo, entre em contato no nosso canal de suporte.',
         'bt_suporte': '💬 Suporte',
         'bt_revolut': '💰 Pagar com Revolut',
+        'bt_paypal': '💰 Pagar com Paypal',
+        
         
     },
 
@@ -222,11 +226,11 @@ language = {
         '3min': 'Your subscription will expire in 30 minutes. Renew the plan again /start.',
         'expirado': 'Your subscription has expired. Renew the plan again /start.',
         'cta1': 'I want to subscribe to VIP € 8,00 🔞',
-        'plano': 'Choose your plan',
-        'mensal': f'🔞 Monthly € {str(preco_us["mensal"])}',
-        'semanal': f'🔥 Weekly € {str(preco_us["semanal"])}',
-        'trimestral': f'😈 Quarterly € {str(preco_us["trimestral"])}',
-        'vitalicio': f'🔥 Forever {str(preco_us["vitalicio"])}',
+        'plano': 'Choose your plan 👇🏻👇🏻👇🏻👇🏻👇🏻',
+        'mensal': f'🔞 Month ${str(preco_us["mensal"])}',
+        'semanal': f'🔥 Week ${str(preco_us["semanal"])}',
+        'trimestral': f'😈 3 Months ${str(preco_us["trimestral"])}',
+        'vitalicio': f'🔥 Lifetime ${str(preco_us["vitalicio"])}',
         'selecionado': 'You selected the plan',
         'voltar_semanal': '🔞 I want the weekly plan',
         "voltar_mensal": '🔞 I want the monthly plan',
@@ -238,6 +242,7 @@ language = {
         'suporte': '💬 If you have any questions, ask or suggest something, contact us in our support channel.',
         'bt_suporte': '💬 Support',
         'bt_revolut': '💰 Pay with Revolut',
+        'bt_paypal': '💰 Pay with Paypal'
     }
 
     

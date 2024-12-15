@@ -1,0 +1,7 @@
+_id,id,nome,username,idioma,assinatura,valor,tipo,criado,expira
+673f859bf24246d5b1763959,6852381113,Paulo,,portugues,true,15.99,mensal,2024-11-21T19:10:19.421Z,2024-12-21T19:10:19.421Z
+674b2609d75c18c6321cbca4,564544272,João Soares,jafsoarez,portugues,true,None,semanal,2024-11-30T14:49:45.575Z,2024-12-07T14:49:45.575Z
+674b30f9d75c18c6321cbcd8,1005371036,Zacarías,zacarias77777777,espanhol,true,None,semanal,2024-11-30T15:36:25.243Z,2024-12-07T15:36:25.243Z
+674b3372d75c18c6321cbcf5,6724377550,Ale,Ale2sss,espanhol,true,None,semanal,2024-11-30T15:46:58.346Z,2024-12-07T15:46:58.346Z
+674c837a0d0880f1afd357c1,1976336520,Rubén,rubenss2,espanhol,true,None,semanal,2024-12-01T15:40:42.576Z,2024-12-08T15:40:42.576Z
+674dff490d0880f1afd358d4,862958498,Ismael,isma_malmont,espanhol,true,None,semanal,2024-12-02T18:41:13.740Z,2024-12-09T18:41:13.740Z
