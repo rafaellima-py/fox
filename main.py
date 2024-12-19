@@ -271,10 +271,10 @@ async def start(message):
             await bot.send_message(message.chat.id, 'Choose your language', reply_markup=language_markup)
 
         if qtd_assinatura == 0:
-            await wellcome_new_user(message, message.from_user.id)
+            await wellcome_new_user(message.from_user.id)
             await set_tempo(message.from_user.id)
         elif qtd_assinatura > 0:
-            await wellcome_new_user(message, message.from_user.id)
+            await wellcome_new_user(message.from_user.id)
             await set_tempo(message.from_user.id)
             
 
@@ -282,38 +282,45 @@ async def start(message):
 
 
 
-async def wellcome_new_user(message, id_user):
-    
+async def wellcome_new_user(id_user):
+    print(id_user)
     idioma = Usuario().ver_idioma(str(id_user))
     #print(idioma)
     if idioma == 'espanhol':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(message.chat.id, f)
+            await bot.send_photo(id_user, f)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
-            await list_products(message, idioma)
+            await list_products(id_user, idioma)
     if idioma == 'portugues':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(message.chat.id, f)
+            await bot.send_photo(id_user, f)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
-            await list_products(message, idioma)
+            await list_products(id_user, idioma)
     
     if idioma == 'ingles':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(message.chat.id, f)
+            await bot.send_photo(id_user, f)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
-            await list_products(message, idioma)
+            await list_products(id_user, idioma)
 
     if idioma == 'portugues_br':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(message.chat.id, f)
+            await bot.send_photo(id_user, f)
+            print(id_user)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
-            await list_products(message, idioma)
+            await list_products(id_user, idioma)
 
 @bot.message_handler(commands=['plans', 'planos', 'plan', ])
-async def list_products(message,idioma=None):
-    idioma = Usuario().ver_idioma(str(message.from_user.id))
+async def list_products(id_user,idioma=None):
+    idioma = Usuario().ver_idioma(str(id_user))
     if not idioma:
-           await start(message)
+            language_markup = InlineKeyboardMarkup(row_width=2)
+            language_markup.add(InlineKeyboardButton(f'🇵🇹 Português', callback_data='set_language_portugues'))
+            language_markup.add(InlineKeyboardButton(f'🇪🇸 Español', callback_data='set_language_espanhol'))
+            language_markup.add(InlineKeyboardButton(f'🇧🇷 Português do Brasil', callback_data='set_language_portugues_br'))
+            language_markup.add(InlineKeyboardButton(f'🇬🇧 English', callback_data='set_language_ingles'))
+            await bot.send_message(id_user, 'Choose your language', reply_markup=language_markup)
+
 
     global mensagens
     markup = InlineKeyboardMarkup(row_width=2)
@@ -323,7 +330,7 @@ async def list_products(message,idioma=None):
     vitalicio = InlineKeyboardButton(language[idioma]['vitalicio'], callback_data='pl_vitalicio')
     markup.add(semanal, mensal, trimestral, vitalicio)
 
-    msg = await bot.send_message(chat_id=message.chat.id, text=language[idioma]['plano'], reply_markup=markup)
+    msg = await bot.send_message(chat_id=id_user, text=language[idioma]['plano'], reply_markup=markup)
     #await registro_historico(msg, message.from_user.id)
 
 
@@ -530,22 +537,23 @@ async def callback(call):
             
             await bot.delete_message(call.message.chat.id, call.message.id)
             Usuario().inserir_idioma(str(call.from_user.id), 'portugues')
-            await wellcome_new_user(call.message, str(call.from_user.id))
+            await wellcome_new_user(str(call.from_user.id))
 
         case 'set_language_espanhol':
             await bot.delete_message(call.message.chat.id, call.message.id)
             Usuario().inserir_idioma(str(call.from_user.id), 'espanhol')
-            await wellcome_new_user(call.message, str(call.from_user.id))
+            await wellcome_new_user(str(call.from_user.id))
 
         case 'set_language_portugues_br':
+            print(call.message.chat.id)
             await bot.delete_message(call.message.chat.id, call.message.id)
             Usuario().inserir_idioma(str(call.from_user.id), 'portugues_br')
-            await wellcome_new_user(call.message, str(call.from_user.id))
+            await wellcome_new_user(str(call.from_user.id))
         
         case 'set_language_ingles':
             await bot.delete_message(call.message.chat.id, call.message.id)
             Usuario().inserir_idioma(str(call.from_user.id), 'ingles')
-            await wellcome_new_user(call.message, str(call.from_user.id))
+            await wellcome_new_user(str(call.from_user.id))
 
             
         case 'pl_semanal':
