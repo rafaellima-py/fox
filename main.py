@@ -288,24 +288,24 @@ async def wellcome_new_user(id_user):
     #print(idioma)
     if idioma == 'espanhol':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(id_user, f)
+            await bot.send_video(id_user, f)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(id_user, idioma)
     if idioma == 'portugues':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(id_user, f)
+            await bot.send_video(id_user, f)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(id_user, idioma)
     
     if idioma == 'ingles':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(id_user, f)
+            await bot.send_video(id_user, f)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(id_user, idioma)
 
     if idioma == 'portugues_br':
         with open('sources/vsl2.mp4', 'rb') as f:
-            await bot.send_photo(id_user, f)
+            await bot.send_video(id_user, f)
             print(id_user)
             #await bot.send_message(message.chat.id, language[idioma]['inicio'])
             await list_products(id_user, idioma)
