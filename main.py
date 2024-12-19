@@ -13,7 +13,7 @@ from random import randint
 mensagens = {}
 temporizador_user = {}
 user_plano = {}
-admin =     '7124703290' #'6721447659' #'673195223'
+admin =    '673195223' #'7124703290' #'6721447659' #'673195223'
 user_images = {}
 canal =  '-1002411773802'#'@SecretinhoOficial'
 historico_previas = {}
@@ -414,6 +414,116 @@ async def callback(call):
     
     
     match call.data:
+
+        case callback if callback.startswith('gerenciar_'):
+            print(callback)
+            id = str(callback.split('_')[1])
+            user_info = Usuario().show_info_assinantes(id)
+            markup = InlineKeyboardMarkup(row_width=2)
+            markup.add(InlineKeyboardButton('Dar vitalício', callback_data=f'extender_vitalicio_{id}'))
+            markup.add(InlineKeyboardButton('Cancelar assinatura ', callback_data=f'cancelar_assinatura_{id}'))
+            markup.add(InlineKeyboardButton('Dar +7 Dias' , callback_data=f'extender_dias_7_{id}'))
+            markup.add(InlineKeyboardButton('Dar +30 Dias' , callback_data=f'extender_dias_30_{id}'))
+            markup.add(InlineKeyboardButton('<< Voltar' , callback_data=f'gerenciar'))
+            if user_info:
+                nome = user_info[0]['nome']
+                username = user_info[0]['username']
+                idioma = user_info[0]['idioma']
+                tipo = user_info[0]['tipo']
+                criacao = user_info[0]['criacao']
+                expiracao = user_info[0]['expiracao']
+                data_format = datetime.datetime.strftime(criacao, "%d-%m-%Y")
+                data_ex_format = datetime.datetime.strftime(expiracao, "%d-%m-%Y")
+                dias_restantes = expiracao - datetime.datetime.now()
+                print(dias_restantes)
+                if dias_restantes.days > 0:
+                    dias_restantes = f"{dias_restantes.days} dias"
+                elif dias_restantes.days == 0:
+                    dias_restantes = f"{dias_restantes.seconds // 60} minutos"
+    
+                await bot.send_message(
+                call.message.chat.id,
+                (
+                f"""
+                📋 **Informações do Assinante** 
+                👤 Nome: {nome}
+                🌐 Usuário: @{username}
+                📖 Idioma: {idioma}
+                📦 Tipo: {tipo}
+                📅 Criado em: {data_format}
+                ⏳ Expira em: {data_ex_format}
+                ⏳ Dias restantes: {dias_restantes}
+
+                """),reply_markup=markup
+                
+            )           
+        case callback if callback.startswith('cancelar_assinatura_'):
+            id = str(callback.split('_')[2])
+
+            try:
+                await bot.kick_chat_member(chat_id=canal, user_id=id)
+                Usuario().delete_assinatura(str(id))
+                        
+            except Exception as e:
+                print(f"Erro ao excluir usuário {id} do chat {canal}: {e}")
+
+
+
+        case callback if callback.startswith('extender_dias_7_'):
+            id = str(callback.split('_')[3])
+            try:
+                Usuario().extender_assinatura(id, 7)
+                await bot.send_message(call.message.chat.id, 'Assinatura foi extendida com sucesso!')
+            except Exception as e:
+                print(e)
+                await bot.send_message(call.message.chat.id, 'Erro ao extender assinatura!')
+        
+        case callback if callback.startswith('extender_dias_30_'):
+            id = str(callback.split('_')[3])
+            print(id, "30dias")
+            try:
+                Usuario().extender_assinatura(id, 30)
+                await bot.send_message(call.message.chat.id, 'Assinatura foi extendida!')
+            except Exception as e:
+                print(e)
+                await bot.send_message(call.message.chat.id, 'Erro ao extender assinatura!')
+        
+        
+        case callback if callback.startswith('extender_vitalicio_'):
+            id = str(callback.split('_')[2])
+            print(id, "vitalício")
+            try:
+                Usuario().extender_vitalicio(id)
+                await bot.send_message(call.message.chat.id, 'Vitalício foi adicionado!')
+            except Exception as e:
+                print(e)
+                await bot.send_message(call.message.chat.id, 'Erro ao adicionar vitalício!')
+        
+   
+   
+        case callback if callback.startswith('gerenciar'):
+            if str(call.from_user.id) != str(admin):
+                await bot.send_message(call.message.chat.id, 'Você não tem permissão para executar esta função.')
+                return
+
+            menu = InlineKeyboardMarkup(row_width=2)
+            assinantes = Usuario().show_info_assinantes()
+
+            if not assinantes:  # Verifica se a lista está vazia
+                await bot.send_message(call.message.chat.id, 'Você não possui nenhuma assinatura.')
+                return
+
+            # Gera o menu com os assinantes
+            for assinante in assinantes:
+                nome = assinante.get('nome', 'N/A')
+                id_assinante = assinante.get('id', 'N/A')
+                username = assinante.get('username', 'N/A')
+                menu.add(InlineKeyboardButton(f"{nome} ({username})", callback_data=f"gerenciar_{id_assinante}"))
+
+            await bot.send_message(call.message.chat.id, 'Escolha um assinante para gerenciar:', reply_markup=menu)
+
+
+
         case 'set_language_portugues':
             
             # se ele caiu aqui, não está cadastrado no banco, entao vamos cadastrar em ambos os idiomas
@@ -634,7 +744,7 @@ async def callback(call):
     user_id = user_images.get(message_id)
     
     if not user_id:
-        await bot.send_message(call.message.chat.id, 'Erro: não foi possível encontrar o usuário.')
+        #await bot.send_message(call.message.chat.id, 'Erro: não foi possível encontrar o usuário.')
         return
     
     match call.data.split('_')[0]:
@@ -784,6 +894,34 @@ Tiempo restante: {str(dias.days)} dias
                     await bot.send_message(message.chat.id, 'No tienes una suscripción activa. Suscríbete a un plan con /start.')
         else:
             await bot.send_message(message.chat.id, 'Erro: Não foi possível determinar seu idioma.')
+
+
+
+
+
+@bot.message_handler(commands=['gerenciar', 'gerenciar_assinatura', 'gerente', 'assinantes'])
+async def gerenciar_assinatura(message):
+    print(message.from_user.id)
+    if str(message.from_user.id) != str(admin):
+        await bot.send_message(message.chat.id, 'Você não tem permissão para executar esta função.')
+        return
+
+    menu = InlineKeyboardMarkup(row_width=2)
+    assinantes = Usuario().show_info_assinantes()
+
+    if not assinantes:  # Verifica se a lista está vazia
+        await bot.send_message(message.chat.id, 'Você não possui nenhuma assinatura.')
+        return
+
+    for assinante in assinantes:
+        nome = assinante['nome']
+        id = assinante['id']
+        username = assinante['username']
+
+        nome_bt = InlineKeyboardButton(f'{nome} ({username})', callback_data=f'gerenciar_{id}')
+        menu.add(nome_bt)
+
+    await bot.send_message(message.chat.id, 'Escolha uma assinatura para gerenciar', reply_markup=menu)
 
 
 
